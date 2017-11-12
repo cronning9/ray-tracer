@@ -16,14 +16,11 @@ export default class CanvasPainter {
   }
 
   static color(ray: Ray, world: Hitable) : Vector {
-    let rec: HitRecord|null = null;
-     
-    const hit = world.hit(ray, 0.0, Number.MAX_VALUE, rec);
+    const hit = world.hit(ray, 0.0, Number.MAX_VALUE, null);
     if (hit) {
-      rec = hit;
       return Vector.multiply(
         0.5, 
-        new Vector(rec.normal.x + 1.0, rec.normal.y + 1.0, rec.normal.z + 1.0));
+        new Vector(hit.normal.x + 1.0, hit.normal.y + 1.0, hit.normal.z + 1.0));
     } else {
       const unitDirection: Vector = Vector.unitVector(ray.direction());
       const t: number = 0.5 * (unitDirection.y + 1.0);

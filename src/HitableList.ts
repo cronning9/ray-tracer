@@ -6,11 +6,11 @@ export default class HitableList extends Hitable {
   list: Array<Hitable>;
   listSize: number;
 
-  constructor(l: Array<Hitable>, n: number) {
+  constructor(l: Array<Hitable>) {
     super();
 
     this.list = l;
-    this.listSize = n;
+    this.listSize = l.length;
   }
 
   hit(ray: Ray, tMin: number, tMax: number, rec: HitRecord|null): HitRecord|null {

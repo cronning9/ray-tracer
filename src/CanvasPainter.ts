@@ -3,15 +3,18 @@ import HitableList from './HitableList';
 import Sphere from './Sphere';
 import Vector from './Vector';
 import Ray from './Ray';
+import Camera from './Camera';
 
 export default class CanvasPainter {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D; // fix once this is better understood
-  
+  ns: number; // no idea wtf this is supposed to be, fuck it
+
   constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     this.canvas = canvas;
     this.canvas.width = width ? width : 500;
     this.canvas.height = height ? height : 500;
+    this.ns = height;
     this.context = this.canvas.getContext('2d')!;
   }
 
@@ -46,26 +49,28 @@ export default class CanvasPainter {
       new Sphere(new Vector(0, -100.5, -1), 100)
     ];
     
-    const world = new HitableList(list, 2);
+    const world = new HitableList(list);
+    const camera = new Camera();
 
     for (let j = this.canvas.height - 1; j >= 0; j--) {
       for (let i = 0; i < this.canvas.width; i++) {
 
-        const a: number = 0xFF; // maintain the value of the a pixel in rgba value at 255
-        const u: number = i / this.canvas.width;
-        const v: number = j / this.canvas.height;
+        const col: Vector = new Vector(0, 0, 0);
+        for (let s = 0; s < this.ns; s++) {
+          const u: number = (i + Math.random()) / this.canvas.width;
+          const v: number = (j + Math.random()) / this.canvas.height;
 
-        const ray = new Ray(origin, 
-          Vector.add(lowerLeftCorner, 
-            Vector.add(Vector.multiply(u, horizontal), Vector.multiply(v, vertical))));
+          const ray: Ray = camera.getRay(u, v);
+          const p: Vector = ray.pointAtParameter(2.0);
+          col.add(CanvasPainter.color(ray, world));
+        }
 
-        const p: Vector = ray.pointAtParameter(2.0);
-        const col = CanvasPainter.color(ray, world);
+        col.divide(this.ns);
 
         const ir = 255.99 * col.x;
         const ig = 255.99 * col.y;
         const ib = 255.99 * col.z;
-        const ia = a;
+        const ia = 0xFF;
 
         imageData.data[arrayOffset] = ir;
         imageData.data[arrayOffset + 1] = ig;
